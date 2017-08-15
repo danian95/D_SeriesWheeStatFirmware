@@ -30,6 +30,7 @@ int dInit;                      //  pwm difference variable based on mVinit
 int dInt;
 int mVfnl;                      // final voltage in mV + 2000
 int dFnl;                       //  pwm difference variable based on mV final
+int dAppl;                      // Applied potential
 //int dDeposit = 75;                 // deposition voltage for ASV experiments; -900 mV
 int dClean = 205;                   // digital value for cleaning mercury off electrode; +400 mV 
                            // cleaning at +400 mV for 30 s, as per ASDL experiment
@@ -138,9 +139,9 @@ void loop (){
   nSteps = abs((dFnl - dInit)/pwm_step);   //number of steps is positive value
   setupDigiPot();               
 
-   PWMWrite(offset_pin,pwmRes,halfRes,pwmClock);  // sets current offset, changed from dOff to halfRes
+  PWMWrite(offset_pin,pwmRes,halfRes,pwmClock);  // sets current offset, changed from dOff to halfRes
 
-///////////  Ramp and CV experiments  ////////////////////
+  ///////////  Ramp and CV experiments  ////////////////////
   if (mode == RAMP || mode == CV || mode == multiCV) {
     ramp();  
     stop(3);   // executes stop command and 3 following zero transmits
@@ -151,10 +152,10 @@ void loop (){
       delay(delay1*1000);
       diffPulse();
         stop(4);
-}
+  }
 
-///////////////  ASV experiments ////////////////////////
-if (mode == ASV || mode == logASV) {
+  ///////////////  ASV experiments ////////////////////////
+  if (mode == ASV || mode == logASV) {
     cleanDepos();  // Clean for 2 sec at Vfnl, deposit for delay 1 at Vinit
     diffPulse();  
 
@@ -174,29 +175,29 @@ if (mode == ASV || mode == logASV) {
       }
     }
         stop(4);
- }
+   }
  
- /////////////// normal pulse experiment ///////////////////
-  if (mode == normalPulse) {            // status check in normPulse() routine
-    digitalWrite(pulse_pin,LOW);              // set pulse pin to low
-//    PWMWrite(signal_pin,pwmRes,dFnl,pwmClock);  // electrode cleaning step
-//    delay(2000);
-    normPulse(); 
-        stop(3);
-  }
+   /////////////// normal pulse experiment ///////////////////
+    if (mode == normalPulse) {            // status check in normPulse() routine
+      digitalWrite(pulse_pin,LOW);              // set pulse pin to low
+  //    PWMWrite(signal_pin,pwmRes,dFnl,pwmClock);  // electrode cleaning step
+  //    delay(2000);
+      normPulse(); 
+          stop(3);
+    }
   
-  /////////////////// chronoamperometry experiments//////////////////
-  if (mode == chronoAmp||mode == chronoAmp2) {
-    digitalWrite(pulse_pin,LOW);              // set pulse pin to low
-//    PWMWrite(signal_pin,pwmRes,dFnl,pwmClock);  // electrode cleaning step
-//    delay(2000);
-    chronAmp();     //changed
-    stop(3);
-  }
+    /////////////////// chronoamperometry experiments//////////////////
+    if (mode == chronoAmp||mode == chronoAmp2) {
+      digitalWrite(pulse_pin,LOW);              // set pulse pin to low
+//      PWMWrite(signal_pin,pwmRes,dFnl,pwmClock);  // electrode cleaning step
+//      delay(2000);
+      chronAmp();     //changed
+      stop(3);
+    }
 }
 
 void stop(int s) {
-      Serial.print(99999);
+    Serial.print(99999);
   for (int r = 0; r<s; r++) {
     Serial.print(",0");
     }
